@@ -14,9 +14,10 @@
 #
 # This method runs for a default large number of epochs/iterations so we don't need to modify this parameter
 
+module load tensorflow/1.14.0-py36-gpu
 module load cuda/10.0.130
 module load cudnn/v7.5.0-cuda92
-module load tensorflow/1.14.0-py36-gpu
+
 
 
 all_n_hidden='16 32'
@@ -24,7 +25,7 @@ all_n_neighbour='8 16 32'
 all_seed_random='853241 599831 27397 598716 277457 223802 777732 169406 481024 621272 454421 924398 155053 759545 621362 930787 397468 726836 449891 270299 614710 400516 375765 951214 208938 194723 618467 596379 946045 451935 127923 37496 945978 658017 20385 419256 631851 942747 204899 24597 211578 674092 388491 350927 202770 82784 373257 599330 540866 108095 957614 208404 401554 184939 41255 167059 748510 513383 208168 558758 866063 960600 401866 158903 489125 519866 694845 50843 900305 438892 184153 745074 470605 139258 148082 810130 905757 686390 367250 289005 474316 979516 709568 314351 26833 960475 850276 765347 880904 239623 102864 333886 694480 847794 563508 341065 329352 846424 450680 511197'
 
 all_dataset_name='cora citeseer'
-all_model='ggp'
+all_model='bgcn-aaai'
 
 split_size_cora='0.948 0.805'
 split_size_citeseer='0.964 0.844'
@@ -72,7 +73,7 @@ then
     RANDOM_SPLIT_SEED=${ptr_seed_random[$i]}
 
     BASENAME=$DATASET_NAME'_graph_supervised_nhidden'$N_HIDDEN'_neighbours'$N_NEIGHBOUR
-    ADJ_MATRIX='Dataset/featured_based_datasets_compatible/'$DATASET_NAME'/'$BASENAME'.gpickle'
+    ADJ_MATRIX='feature_based_datasets/'$DATASET_NAME'/'$BASENAME'.gpickle'
 
 
     if [ "$DATASET_NAME" = "cora" ]; then
