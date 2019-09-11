@@ -25,7 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', type=str, default='citeseer', help='which dataset to use')
     parser.add_argument('--label_n_per_class', type=int, default=10, help='trial index')
     parser.add_argument('--data_partition_seed', type=int, default=101,
-                        help='The seed to use split the data for trial.')
+                        help='The seed to use split the datasets for trial.')
     parser.add_argument('--trial_index', type=int, default=0, help='trial index')
     parser.add_argument('--model_name', type=str, default='BGCN', help='which model we use for training (GCN or BGCN)')
     parser.add_argument('--save_log', type=lambda s: s.lower() in ['true', 't', 'yes', '1'], default=False,
@@ -66,9 +66,9 @@ if __name__ == '__main__':
     if save_log:
         save_log_func(code_path, dataset, model_name, trial_index, data_partition_seed)
 
-    # =============================Load data=================================================
+    # =============================Load datasets=================================================
 
-    dataset_dir = code_path + '' + '/data'
+    dataset_dir = code_path + '' + '/datasets'
     if not random_partition:
         adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask, labels = data_partition_fix(
             dataset_dir=dataset_dir, dataset_name=dataset, label_n_per_class=label_n_per_class)
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask, labels = data_partition_random(
             dataset_dir=dataset_dir, dataset_name=dataset, label_n_per_class=label_n_per_class)
     else:
-        "Wrong input data format"
+        "Wrong input datasets format"
 
     # ==================================Train Model===========================================
 

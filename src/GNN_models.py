@@ -20,11 +20,11 @@ from scipy.sparse import csr_matrix
 import tensorflow as tf
 import numpy as np
 
+import os
 
 class GnnModel:
     def __init__(self, FLAGs, node_features, one_hot_labels, adj, y_train, y_val, y_test, train_mask, val_mask, test_mask,
-                 checkpt_name,
-                 model_name='BGCN'):
+                 checkpt_name, model_name='BGCN', results_dir=None):
 
         self.FLAGs = FLAGs
         self.model_name = model_name
@@ -35,6 +35,7 @@ class GnnModel:
         self.n = len(y_train)
         self.k = len(y_train[0])
         self.checkpt_name = checkpt_name
+        self.results_dir=results_dir
 
         self.y_train = y_train
         self.y_val = y_val
@@ -188,7 +189,28 @@ class GnnModel:
 
         return soft_labels_og_graph, soft_labels_sample_graphs
 
+    def get_metrics(self):
+        """
+
+        :return:
+        """
+        y_pred_all = self.MC_final_prediction_soft / np.sum(self.MC_final_prediction_soft, axis=1, keepdims=True)
+        y_pred = y_pred_all[self.test_set_index, :]
+        y_pred_val = y_pred_all[self.val_set_index, :]
+        y_test = self.labels[self.test_set_index]
+        y_val = self.labels[self.val_set_index]
+
+        acc_test = evaluate_accuracy(y_test, y_pred)
+        mnlp_test = evaluate_mnlp(y_test, y_pred)
+        acc_val = evaluate_accuracy(y_val, y_pred_val)
+        mnlp_val = evaluate_mnlp(y_val, y_pred_val)
+
+        return acc_test, mnlp_test, acc_val, mnlp_val
+
     def train(self):
+
+        results_filename = write_results_header(self.results_dir, "epoch,accuracy_test,mnlp_test,accuracy_val,mnlp_val")
+
         for epoch in range(self.FLAGs.epochs):
             if self.model_name == 'BGCN':
                 # =======================================GCNN pre train process=====================================
@@ -233,6 +255,11 @@ class GnnModel:
                         self.MC_final_prediction_soft += self.soft_prediction_labels_sample_graph
                         self.MC_final_prediction = self.MC_final_prediction_soft.argmax(axis=1)
 
+                        # Introduce my metrics here, getting actual probabilities
+                        # I AM HERE
+                        acc_test, mnlp_test, acc_val, mnlp_val = self.get_metrics()
+                        write_results(epoch, acc_test, mnlp_test, acc_val, mnlp_val, results_filename)
+
                 if epoch == self.FLAGs.epochs - 1:
                     acc_sample_graph = accuracy_score(self.labels[self.test_set_index],
                                                       self.MC_final_prediction[self.test_set_index])
@@ -258,3 +285,75 @@ class GnnModel:
                 raise ValueError('Invalid argument for model: ' + str(self.FLAGs.model))
 
         print("Optimization Finished!")
+
+
+def evaluate_accuracy(ytrue, ypred):
+
+    """
+    :param ytrue: Nx1 array of labels
+    :param ypred: NxK array of predicted probabilities
+    :return:
+
+
+    """
+    return np.mean(np.argmax(ypred, 1) == ytrue)
+
+
+def evaluate_mnlp(ytrue, ypred):
+    """
+    :param ytrue: Nx1 array of labels. ytrue \in [0, K-1], where K=# classes
+    :param ypred: NxK array of predicted probabilities
+    :return:
+    """
+    probs = ypred[range(ypred.shape[0]), ytrue]
+    return - np.mean(np.log(probs))
+
+
+def write_results_header(results_dir, header):
+
+    # setup writing results to disk
+    results_filename = None
+    if results_dir is not None:
+        if not os.path.exists(os.path.expanduser(results_dir)):
+            print("Results dir does not exist.")
+            print("Creating results dir at {}".format(os.path.expanduser(results_dir)))
+            os.makedirs(os.path.expanduser(results_dir))
+            print(
+                "Created results directory: {}".format(os.path.expanduser(results_dir))
+            )
+        else:
+            print("Results directory already exists.")
+
+        # write headers on results file
+        results_filename = os.path.join(
+            os.path.expanduser(results_dir),  "results.csv"
+        )
+
+        # write the column names
+        with open(results_filename, "w", buffering=1) as fh_results:
+            fh_results.write(header + "\n")
+
+    return results_filename
+
+
+def write_results(epoch, acc_test, mnlp_test, acc_val, mnlp_val, results_filename):
+    """
+
+    :param epoch:
+    :param acc_test:
+    :param mnlp_test:
+    :param acc_val:
+    :param mnlp_val:
+    :param results_filename:
+    :return:
+    """
+    results_str = "{},{:04f},{:04f},{:04f},{:04f}\n".format(epoch, acc_test, mnlp_test, acc_val, mnlp_val)
+    with open(results_filename, "a", buffering=1) as fh_results:
+        fh_results.write(results_str)
+
+    return
+
+
+
+
+

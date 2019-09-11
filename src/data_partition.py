@@ -12,7 +12,7 @@ from src.utils_gcn import load_data
 
 
 def data_partition_random(dataset_dir, dataset_name, label_n_per_class):
-    # Random data partition
+    # Random datasets partition
     text_set_n = 1000
     val_set_n = 500
     adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask, one_hot_labels = load_data(dataset_name, dataset_dir)
