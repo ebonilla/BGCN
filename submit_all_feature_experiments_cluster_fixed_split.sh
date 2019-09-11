@@ -14,9 +14,10 @@
 #
 # This method runs for a default large number of epochs/iterations so we don't need to modify this parameter
 
+module load tensorflow/1.14.0-py36-gpu
 module load cuda/10.0.130
 module load cudnn/v7.5.0-cuda92
-module load tensorflow/1.14.0-py36-gpu
+
 
 
 all_n_hidden='16 32'
@@ -69,7 +70,7 @@ then
     SEED_VAL=${ptr_seed_val[$i]}
 
     BASENAME=$DATASET_NAME'_graph_supervised_nhidden'$N_HIDDEN'_neighbours'$N_NEIGHBOUR
-    ADJ_MATRIX='Dataset/featured_based_datasets_compatible/'$DATASET_NAME'/'$BASENAME'.gpickle'
+    ADJ_MATRIX='feature_based_datasets/'$DATASET_NAME'/'$BASENAME'.gpickle'
 
     #str_options='--dataset='$DATASET_NAME' --epochs='$EPOCHS' --adjacency='$ADJ_MATRIX' --random-seed-np='$RANDOM_SEED' --random-seed-tf='$RANDOM_SEED' --fixed-split  --add-val --add-val-seed='$SEED_VAL
     str_options='--dataset='$DATASET_NAME' --adjacency='$ADJ_MATRIX' --random-seed-np='$RANDOM_SEED' --random-seed-tf='$RANDOM_SEED' --fixed-split  --add-val --add-val-seed='$SEED_VAL
