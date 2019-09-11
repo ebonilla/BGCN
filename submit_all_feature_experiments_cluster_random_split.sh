@@ -12,10 +12,11 @@
 # use e.g. sbatch -a 0-999 submit_all_noisy_experiments_bracewell.sh
 # where 0-999 are the range of the indices of the jobs
 #
+# This method runs for a default large number of epochs/iterations so we don't need to modify this parameter
 
 module load cuda/10.0.130
 module load cudnn/v7.5.0-cuda92
-source ~/graphGP-env/bin/activate
+module load tensorflow/1.14.0-py36-gpu
 
 
 all_n_hidden='16 32'
