@@ -300,7 +300,7 @@ def get_data(dataset_name, random_split, split_sizes, random_split_seed,
         tf.logging.info("Using KNN graph")
         A = kneighbors_graph(X, knn_k, metric=knn_metric)
 
-        # consistent with our implenentation of only considering the lower triangular
+        # consistent with our implementation of only considering the lower triangular
         A = sp.sparse.tril(A, k=-1)
         A = A + np.transpose(A)
 
