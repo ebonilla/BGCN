@@ -102,6 +102,10 @@ def save_parameters(params, results_dir):
     default=cfg.USE_HALF_VAL_TO_TRAIN,
     help="Use half the validation data in training.",
 )
+@click.option("-s", "--seed", default=cfg.SEED, type=click.INT, help="Random seed")
+@click.option(
+    "-s", "--seed-np", default=cfg.SEED_NP, type=click.INT, help="Random seed for numpy"
+)
 @click.option(
     "--seed-val",
     default=cfg.SEED_VAL,
@@ -142,6 +146,8 @@ def main(name,
          split_sizes,
          random_split_seed,
          use_half_val_to_train,
+         seed,
+         seed_np,
          seed_val,
          use_knn_graph,
          knn_metric,
@@ -165,6 +171,8 @@ def main(name,
     :param results_dir:
     :return:
     """
+    tf.random.set_random_seed(seed)
+    random_state = np.random.RandomState(seed_np)
 
     FLAGS.epochs = epochs
     params = click.get_current_context().params
