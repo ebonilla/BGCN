@@ -21,9 +21,13 @@ from src.base import (
     load_adjacency_from_file,
 )
 
+from src.utils_gcn import load_data
+from sklearn.neighbors import kneighbors_graph
+
+import scipy as sp
+
 ADJ_FORMAT = "csr"  # the default format for a BGCN models
 
-from src.utils_gcn import load_data
 
 def load_pickle(name, ext, data_home="datasets", encoding="latin1"):
 
@@ -284,9 +288,21 @@ def add_val_to_train(mask_train, mask_val, seed_val, p):
 def get_data(dataset_name, random_split, split_sizes, random_split_seed,
              add_val=True, add_val_seed=1, p_val=0.5,
              adjacency_filename=None,
-             balanced_split=False, samples_per_class=20):
+             use_knn_graph=False,
+             knn_metric=None,
+             knn_k=None,
+             balanced_split=False,
+             samples_per_class=20):
 
     A, X, y_train, y_val, y_test, mask_train, mask_val, mask_test, y = load_data(dataset_name, "datasets")
+
+    if use_knn_graph:
+        tf.logging.info("Using KNN graph")
+        A = kneighbors_graph(X, knn_k, metric=knn_metric)
+
+        # consistent with our implenentation of only considering the lower triangular
+        A = sp.sparse.tril(A, k=-1)
+        A = A + np.transpose(A)
 
     if adjacency_filename:
         A = load_adjacency_from_file(adjacency_filename)

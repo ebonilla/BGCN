@@ -86,6 +86,8 @@ def edges_non_edges_index(adj, N, node_neighbors_dict):
     start_edges = 0
     start_non_edges = 0
     for i in range(N):
+        #if i == 2573:
+        #    print("hello")
         # deal with links
         node_i_neighbors = node_neighbors_dict[i]
         node_i_upper_tri_index = np.arange(i+1 , N)
