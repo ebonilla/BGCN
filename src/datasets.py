@@ -307,6 +307,10 @@ def get_data(dataset_name, random_split, split_sizes, random_split_seed,
     if adjacency_filename:
         A = load_adjacency_from_file(adjacency_filename)
 
+        # consistent with our implementation of only considering the lower triangular
+        A = sp.sparse.tril(A, k=-1)
+        A = A + np.transpose(A)
+
     n, d = X.shape
     _, k = y.shape
 
