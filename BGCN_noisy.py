@@ -51,6 +51,7 @@ def save_parameters(params, results_dir):
 
 
 @click.command()
+@click.argument("name")
 @click.option(
     "--dataset",
     default="cora",
@@ -131,7 +132,8 @@ def save_parameters(params, results_dir):
     help="name of results directory [string]",
     default="./results",
 )
-def main(dataset,
+def main(name,
+         dataset,
          epochs,
          adjacency,
          random_seed_np,
