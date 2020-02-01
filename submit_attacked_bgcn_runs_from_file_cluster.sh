@@ -19,7 +19,7 @@ module load tensorflow/1.14.0-py36-gpu
 module load cuda/10.0.130
 module load cudnn/v7.5.0-cuda92
 
-IFS=$'\n' read -d '' -r -a lines < runs-knngraph-bgcn-aaai.txt
+IFS=$'\n' read -d '' -r -a lines < runs-attacked-bgcn-aaai.txt
 
 # Submit job
 if [ ! -z "$SLURM_ARRAY_TASK_ID" ]
