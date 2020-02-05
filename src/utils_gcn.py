@@ -14,6 +14,10 @@ import networkx as nx
 import sys
 import scipy.sparse as sp
 
+from scipy.sparse import coo_matrix
+import os
+import pandas as pd
+
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
@@ -31,7 +35,40 @@ def sample_mask(idx, l):
     mask[idx] = 1
     return np.array(mask, dtype=np.bool)
 
+
+def load_polblogs(data_home="datasets/polblogs"):
+
+    # load the graph
+    g_nx = nx.read_gpickle(os.path.join(data_home, "polblogs_graph.gpickle"))
+
+    # Load the labels
+    y_all = np.load(os.path.join(data_home, "polblogs_labels.npy"))
+
+    df_y = pd.DataFrame({"a": y_all, "b": 1 - y_all})
+    y_all = df_y.values
+
+    X_all = np.eye(g_nx.number_of_nodes())
+
+    print("y_all shape {}".format(y_all.shape))
+    print("X_all shape {}".format(X_all.shape))
+
+    # Extract the adjacency matrix.
+    # A should be scipy sparse matrix
+    print("Extracting A from networkx graph")
+    A = nx.to_scipy_sparse_matrix(g_nx, format="coo", dtype=np.int)
+    # Remove self loops and set maximum value to 1
+    adj = A.todense()
+    adj[adj>1] = 1
+    np.fill_diagonal(adj, 0)
+    # convert back to scipy sparse matrix
+    A = coo_matrix(adj)
+    print("...Done")
+
+    return X_all, y_all, A
+
+
 def load_data(dataset_str, dataset_dir):
+
     """Load datasets."""
     names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph']
     objects = []

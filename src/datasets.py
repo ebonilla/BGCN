@@ -22,6 +22,8 @@ from src.base import (
 )
 
 from src.utils_gcn import load_data
+from src.utils_gcn import load_polblogs
+
 from sklearn.neighbors import kneighbors_graph
 
 import scipy as sp
@@ -294,7 +296,11 @@ def get_data(dataset_name, random_split, split_sizes, random_split_seed,
              balanced_split=False,
              samples_per_class=20):
 
-    A, X, y_train, y_val, y_test, mask_train, mask_val, mask_test, y = load_data(dataset_name, "datasets")
+    if dataset_name == 'polblogs':
+        X, y, A = load_polblogs()
+        X = sp.sparse.lil_matrix(X)
+    else:
+        A, X, y_train, y_val, y_test, mask_train, mask_val, mask_test, y = load_data(dataset_name, "datasets")
 
     if use_knn_graph:
         tf.logging.info("Using KNN graph")
