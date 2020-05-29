@@ -297,7 +297,8 @@ def get_data(dataset_name, random_split, split_sizes, random_split_seed,
              samples_per_class=20):
 
     if dataset_name == 'polblogs':
-        X, y, A = load_polblogs()
+        X, y, _ = load_polblogs()
+        A = load_adjacency_from_file("datasets/polblogs/polblogs_graph.gpickle")
         X = sp.sparse.lil_matrix(X)
     else:
         A, X, y_train, y_val, y_test, mask_train, mask_val, mask_test, y = load_data(dataset_name, "datasets")
